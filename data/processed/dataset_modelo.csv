@@ -19,23 +19,23 @@ partida_id,rodada,data_realizacao,status,time_mandante_id,mandante,time_visitant
 27668,3,2026-02-12,finalizado,65,Corinthians,64,Bragantino,2.0,0.0,vitoria_mandante,2,3,0,1.5,1.0,1.0,3.0,1.0,0.0
 27673,3,2026-02-10,finalizado,102,Vitória,18,Flamengo,1.0,2.0,vitoria_visitante,3,0,3,1.5,1.5,2.5,0.5,1.0,1.5
 27672,3,2026-02-12,finalizado,185,Athletico-PR,63,Santos,2.0,1.0,vitoria_mandante,3,3,0,1.5,0.5,0.5,0.5,1.5,2.5
-27680,4,2026-02-25,finalizado,37,Cruzeiro,65,Corinthians,1.0,1.0,empate,2,1,1,0.3333333333333333,1.0,2.6666666666666665,2.0,1.3333333333333333,0.6666666666666666
-27681,4,2026-02-25,finalizado,45,Grêmio,30,Atlético-MG,2.0,1.0,vitoria_mandante,3,3,0,1.0,2.0,2.3333333333333335,0.6666666666666666,1.6666666666666667,2.0
-27678,4,2026-02-25,finalizado,56,Palmeiras,26,Fluminense,2.0,1.0,vitoria_mandante,3,3,0,2.3333333333333335,3.3333333333333335,1.3333333333333333,2.3333333333333335,1.3333333333333333,0.6666666666666666
-27677,4,2026-02-26,finalizado,63,Santos,23,Vasco,2.0,1.0,vitoria_mandante,3,3,0,0.3333333333333333,1.3333333333333333,2.3333333333333335,0.3333333333333333,0.6666666666666666,1.3333333333333333
-27679,4,2026-02-25,finalizado,64,Bragantino,185,Athletico-PR,1.0,1.0,empate,2,1,1,2.0,0.6666666666666666,0.6666666666666666,2.0,1.0,0.6666666666666666
-27684,4,2026-02-25,finalizado,81,Remo,44,Internacional,1.0,1.0,empate,2,1,1,0.6666666666666666,1.6666666666666667,2.3333333333333335,0.3333333333333333,0.6666666666666666,1.6666666666666667
-27682,4,2026-02-25,finalizado,84,Coritiba,57,São Paulo,0.0,1.0,vitoria_visitante,1,0,3,1.3333333333333333,1.6666666666666667,1.6666666666666667,2.3333333333333335,1.6666666666666667,0.6666666666666666
-27685,5,2026-03-11,finalizado,18,Flamengo,37,Cruzeiro,2.0,0.0,vitoria_mandante,2,3,0,1.3333333333333333,1.3333333333333333,1.3333333333333333,0.5,1.0,2.25
+27680,4,2026-02-25,finalizado,37,Cruzeiro,65,Corinthians,1.0,1.0,empate,2,1,1,0.33,1.0,2.67,2.0,1.33,0.67
+27681,4,2026-02-25,finalizado,45,Grêmio,30,Atlético-MG,2.0,1.0,vitoria_mandante,3,3,0,1.0,2.0,2.33,0.67,1.67,2.0
+27678,4,2026-02-25,finalizado,56,Palmeiras,26,Fluminense,2.0,1.0,vitoria_mandante,3,3,0,2.33,3.33,1.33,2.33,1.33,0.67
+27677,4,2026-02-26,finalizado,63,Santos,23,Vasco,2.0,1.0,vitoria_mandante,3,3,0,0.33,1.33,2.33,0.33,0.67,1.33
+27679,4,2026-02-25,finalizado,64,Bragantino,185,Athletico-PR,1.0,1.0,empate,2,1,1,2.0,0.67,0.67,2.0,1.0,0.67
+27684,4,2026-02-25,finalizado,81,Remo,44,Internacional,1.0,1.0,empate,2,1,1,0.67,1.67,2.33,0.33,0.67,1.67
+27682,4,2026-02-25,finalizado,84,Coritiba,57,São Paulo,0.0,1.0,vitoria_visitante,1,0,3,1.33,1.67,1.67,2.33,1.67,0.67
+27685,5,2026-03-11,finalizado,18,Flamengo,37,Cruzeiro,2.0,0.0,vitoria_mandante,2,3,0,1.33,1.33,1.33,0.5,1.0,2.25
 27686,5,2026-03-12,finalizado,23,Vasco,56,Palmeiras,2.0,1.0,vitoria_mandante,3,3,0,0.25,0.75,1.5,2.5,3.0,1.25
 27690,5,2026-03-11,finalizado,30,Atlético-MG,44,Internacional,1.0,0.0,vitoria_mandante,1,3,0,0.5,1.5,2.0,0.5,0.75,1.5
 27691,5,2026-03-12,finalizado,45,Grêmio,64,Bragantino,1.0,1.0,empate,2,1,1,1.5,2.0,2.0,1.75,0.75,0.75
-27687,5,2026-03-12,finalizado,57,São Paulo,5,Chapecoense,2.0,0.0,vitoria_mandante,2,3,0,2.5,1.5,0.5,1.6666666666666667,2.6666666666666665,2.0
-27689,5,2026-03-10,finalizado,60,Mirassol,63,Santos,2.0,2.0,empate,4,1,1,1.6666666666666667,2.0,1.6666666666666667,1.0,1.5,2.0
+27687,5,2026-03-12,finalizado,57,São Paulo,5,Chapecoense,2.0,0.0,vitoria_mandante,2,3,0,2.5,1.5,0.5,1.67,2.67,2.0
+27689,5,2026-03-10,finalizado,60,Mirassol,63,Santos,2.0,2.0,empate,4,1,1,1.67,2.0,1.67,1.0,1.5,2.0
 27688,5,2026-03-11,finalizado,65,Corinthians,84,Coritiba,0.0,2.0,vitoria_visitante,2,0,3,1.75,1.25,0.75,1.0,1.25,1.5
-27693,5,2026-03-11,finalizado,68,Bahia,102,Vitória,1.0,1.0,empate,2,1,1,2.3333333333333335,1.3333333333333333,0.6666666666666666,1.0,1.3333333333333333,2.3333333333333335
+27693,5,2026-03-11,finalizado,68,Bahia,102,Vitória,1.0,1.0,empate,2,1,1,2.33,1.33,0.67,1.0,1.33,2.33
 27694,5,2026-03-12,finalizado,81,Remo,26,Fluminense,0.0,2.0,vitoria_visitante,2,0,3,0.75,1.5,2.0,1.75,1.25,1.0
-27692,5,2026-03-29,finalizado,185,Athletico-PR,22,Botafogo,4.0,1.0,vitoria_mandante,5,3,0,1.75,1.0,0.75,1.0,2.3333333333333335,2.0
+27692,5,2026-03-29,finalizado,185,Athletico-PR,22,Botafogo,4.0,1.0,vitoria_mandante,5,3,0,1.75,1.0,0.75,1.0,2.33,2.0
 27704,6,2026-03-16,finalizado,5,Chapecoense,45,Grêmio,1.0,1.0,empate,2,1,1,1.25,2.0,2.0,1.4,1.8,1.8
 27696,6,2026-03-14,finalizado,22,Botafogo,18,Flamengo,0.0,3.0,vitoria_visitante,3,0,3,0.75,2.0,2.5,1.75,1.5,1.0
 27695,6,2026-03-15,finalizado,26,Fluminense,185,Athletico-PR,3.0,2.0,vitoria_mandante,5,3,0,2.0,1.4,0.8,2.0,1.6,0.8
