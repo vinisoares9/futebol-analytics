@@ -5,6 +5,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
+import subprocess
+import sys
 
 load_dotenv()
 
@@ -97,3 +99,33 @@ def prever_resultado(req: PrevisaoRequest):
         "probabilidades": {classe: round(float(prob), 3) for classe, prob in zip(classes, probabilidades)}
     }
 
+@app.post("/atualizar-dados")
+def atualizar_dados():
+    try:
+        resultado_extract = subprocess.run(
+            [sys.executable, "src/extract.py"],
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+        if resultado_extract.returncode != 0:
+            raise HTTPException(status_code=500, detail=f"Erro na extração: {resultado_extract.stderr}")
+
+        resultado_load = subprocess.run(
+            [sys.executable, "src/load_db.py"],
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+        if resultado_load.returncode != 0:
+            raise HTTPException(status_code=500, detail=f"Erro na carga: {resultado_load.stderr}")
+
+        return {
+            "status": "sucesso",
+            "mensagem": "Dados atualizados com sucesso",
+            "detalhes_extracao": resultado_extract.stdout[-500:],
+            "detalhes_carga": resultado_load.stdout[-500:]
+        }
+
+    except subprocess.TimeoutExpired:
+        raise HTTPException(status_code=504, detail="Tempo limite excedido ao atualizar os dados")
