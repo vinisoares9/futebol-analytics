@@ -127,9 +127,9 @@ Três páginas, com modelagem em **esquema estrela** (tabela-calendário separad
 
 **Visão Geral** — tabela de classificação completa (pontos, saldo de gols, aproveitamento), KPIs de gols totais e médias, ranking de ataque, comparação de vitórias mandante vs. visitante.
 
-![Página Visão Geral](docs/imagens/pagina_1_dashboard.png)
-![Página Desempenho por Time](docs/imagens/pagina_2_dashboard.png)
-![Página Calendário e Confrontos](docs/imagens/pagina_3_dashboard.png)
+![Página Visão Geral](docs/imagens/dashboard_visao_geral.png)
+![Página Desempenho por Time](docs/imagens/dashboard_desempenho_time.png)
+![Página Calendário e Confrontos](docs/imagens/dashboard_calendario.png)
 
 **Desempenho por Time** — tabela detalhada por time, gráfico de evolução de pontos acumulados ao longo da temporada (filtrável por time), gráfico de dispersão (gols marcados vs. sofridos) para leitura tática do campeonato.
 
