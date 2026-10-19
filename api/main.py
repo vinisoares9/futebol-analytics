@@ -1,21 +1,56 @@
 import os
+import subprocess
+import sys
+from pathlib import Path
+
 import joblib
 import pandas as pd
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import create_engine
-from dotenv import load_dotenv
-import subprocess
-import sys
 
-load_dotenv()
+RAIZ = Path(__file__).resolve().parent.parent
+sys.path.append(str(RAIZ / "src"))
+
+from features import calcular_features, carregar_partidas, normalizar_nome  # noqa: E402
+
+load_dotenv(RAIZ / ".env")
 
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
-engine = create_engine(f"mysql+mysqlconnector://root:{MYSQL_PASSWORD}@localhost/futebol_analytics")
+engine = (
+    create_engine(f"mysql+mysqlconnector://root:{MYSQL_PASSWORD}@localhost/futebol_analytics")
+    if MYSQL_PASSWORD else None
+)
 
-modelo = joblib.load("api/modelo_resultado.pkl")
+# O arquivo salvo pelo notebook guarda o modelo, as features usadas e os parâmetros do Elo
+artefato = joblib.load(RAIZ / "api/modelo_resultado.pkl")
+modelo = artefato["modelo"]
+FEATURES = artefato["features"]
+PARAMETROS_ELO = artefato["parametros_elo"]
 
 app = FastAPI(title="API de Previsão - Brasileirão 2026")
+
+# Estado atual dos times (Elo e forma), recalculado ao iniciar e após cada atualização
+contexto = {}
+
+
+def recalcular_estado():
+    """Processa todas as partidas em ordem de data, com o mesmo código usado no treino."""
+    partidas = carregar_partidas(engine, caminho_csv=RAIZ / "data/processed/partidas.csv")
+    _, estado = calcular_features(partidas, PARAMETROS_ELO)
+
+    times_2026 = partidas[partidas["fonte"] == "api_2026"]
+    nomes = pd.concat([
+        times_2026[["mandante_id", "mandante"]].set_axis(["time_id", "nome"], axis=1),
+        times_2026[["visitante_id", "visitante"]].set_axis(["time_id", "nome"], axis=1),
+    ]).drop_duplicates("time_id")
+
+    contexto["estado"] = estado
+    contexto["times"] = {int(r.time_id): r.nome for r in nomes.itertuples()}
+
+
+recalcular_estado()
 
 
 class PrevisaoRequest(BaseModel):
@@ -23,108 +58,69 @@ class PrevisaoRequest(BaseModel):
     time_visitante_id: int
 
 
-def calcular_forma_time(time_id: int):
-    query = f"""
-        select p.rodada, p.placar_mandante, p.placar_visitante,
-               p.time_mandante_id, p.time_visitante_id
-        from partidas p
-        where p.status = 'finalizado'
-          and (p.time_mandante_id = {time_id} or p.time_visitante_id = {time_id})
-        order by p.rodada desc
-        limit 5
-    """
-    df = pd.read_sql(query, engine)
-
-    if df.empty:
-        return None
-
-    pontos_lista = []
-    gols_feitos_lista = []
-    gols_sofridos_lista = []
-
-    for _, row in df.iterrows():
-        if row['time_mandante_id'] == time_id:
-            gols_feitos = row['placar_mandante']
-            gols_sofridos = row['placar_visitante']
-        else:
-            gols_feitos = row['placar_visitante']
-            gols_sofridos = row['placar_mandante']
-
-        if gols_feitos > gols_sofridos:
-            pontos = 3
-        elif gols_feitos == gols_sofridos:
-            pontos = 1
-        else:
-            pontos = 0
-
-        pontos_lista.append(pontos)
-        gols_feitos_lista.append(gols_feitos)
-        gols_sofridos_lista.append(gols_sofridos)
-
-    return {
-        "media_pontos_5j": sum(pontos_lista) / len(pontos_lista),
-        "media_gols_feitos_5j": sum(gols_feitos_lista) / len(gols_feitos_lista),
-        "media_gols_sofridos_5j": sum(gols_sofridos_lista) / len(gols_sofridos_lista)
-    }
-
-
 @app.get("/")
 def raiz():
     return {"mensagem": "API de Previsão do Brasileirão 2026 está no ar"}
 
 
+@app.get("/times")
+def listar_times():
+    """Lista os times de 2026 com o ID usado em /prever e o rating Elo atual."""
+    estado = contexto["estado"]
+    times = [
+        {"time_id": time_id, "nome": nome, "elo": round(estado.rating(normalizar_nome(nome)), 1)}
+        for time_id, nome in contexto["times"].items()
+    ]
+    return sorted(times, key=lambda t: t["elo"], reverse=True)
+
+
 @app.post("/prever")
 def prever_resultado(req: PrevisaoRequest):
-    forma_mandante = calcular_forma_time(req.time_mandante_id)
-    forma_visitante = calcular_forma_time(req.time_visitante_id)
+    times = contexto["times"]
+    if req.time_mandante_id not in times or req.time_visitante_id not in times:
+        raise HTTPException(status_code=404, detail="Time não encontrado. Consulte os IDs em GET /times.")
+    if req.time_mandante_id == req.time_visitante_id:
+        raise HTTPException(status_code=400, detail="Mandante e visitante devem ser times diferentes.")
 
-    if forma_mandante is None or forma_visitante is None:
-        raise HTTPException(status_code=404, detail="Não há histórico suficiente para um dos times informados.")
+    mandante = times[req.time_mandante_id]
+    visitante = times[req.time_visitante_id]
 
-    features = pd.DataFrame([{
-        "mandante_media_pontos_5j": forma_mandante["media_pontos_5j"],
-        "mandante_media_gols_feitos_5j": forma_mandante["media_gols_feitos_5j"],
-        "mandante_media_gols_sofridos_5j": forma_mandante["media_gols_sofridos_5j"],
-        "visitante_media_pontos_5j": forma_visitante["media_pontos_5j"],
-        "visitante_media_gols_feitos_5j": forma_visitante["media_gols_feitos_5j"],
-        "visitante_media_gols_sofridos_5j": forma_visitante["media_gols_sofridos_5j"]
-    }])
+    todas = contexto["estado"].features(normalizar_nome(mandante), normalizar_nome(visitante))
+    entrada = pd.DataFrame([{f: todas[f] for f in FEATURES}])
 
-    previsao = modelo.predict(features)[0]
-    probabilidades = modelo.predict_proba(features)[0]
-    classes = modelo.classes_
+    previsao = modelo.predict(entrada)[0]
+    probabilidades = modelo.predict_proba(entrada)[0]
 
     return {
+        "mandante": mandante,
+        "visitante": visitante,
         "previsao": previsao,
-        "probabilidades": {classe: round(float(prob), 3) for classe, prob in zip(classes, probabilidades)}
+        "probabilidades": {
+            classe: round(float(prob), 3) for classe, prob in zip(modelo.classes_, probabilidades)
+        },
+        "features": {f: round(float(v), 3) for f, v in entrada.iloc[0].items()},
     }
+
 
 @app.post("/atualizar-dados")
 def atualizar_dados():
     try:
-        resultado_extract = subprocess.run(
-            [sys.executable, "src/extract.py"],
-            capture_output=True,
-            text=True,
-            timeout=300
-        )
-        if resultado_extract.returncode != 0:
-            raise HTTPException(status_code=500, detail=f"Erro na extração: {resultado_extract.stderr}")
+        etapas = {}
+        for nome, script in [("extracao", "src/extract.py"), ("carga", "src/load_db.py")]:
+            resultado = subprocess.run(
+                [sys.executable, script], capture_output=True, text=True, timeout=300, cwd=RAIZ
+            )
+            if resultado.returncode != 0:
+                raise HTTPException(status_code=500, detail=f"Erro na {nome}: {resultado.stderr[-500:]}")
+            etapas[nome] = resultado.stdout[-500:]
 
-        resultado_load = subprocess.run(
-            [sys.executable, "src/load_db.py"],
-            capture_output=True,
-            text=True,
-            timeout=300
-        )
-        if resultado_load.returncode != 0:
-            raise HTTPException(status_code=500, detail=f"Erro na carga: {resultado_load.stderr}")
+        recalcular_estado()
 
         return {
             "status": "sucesso",
-            "mensagem": "Dados atualizados com sucesso",
-            "detalhes_extracao": resultado_extract.stdout[-500:],
-            "detalhes_carga": resultado_load.stdout[-500:]
+            "mensagem": "Dados atualizados e ratings recalculados",
+            "detalhes_extracao": etapas["extracao"],
+            "detalhes_carga": etapas["carga"],
         }
 
     except subprocess.TimeoutExpired:

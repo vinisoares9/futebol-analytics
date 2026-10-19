@@ -48,7 +48,8 @@ def inserir_partida(cursor, partida, rodada_numero):
         ON DUPLICATE KEY UPDATE
             placar_mandante = VALUES(placar_mandante),
             placar_visitante = VALUES(placar_visitante),
-            status = VALUES(status)
+            status = VALUES(status),
+            data_realizacao = VALUES(data_realizacao)
     """
     valores = (
         partida["partida_id"],
